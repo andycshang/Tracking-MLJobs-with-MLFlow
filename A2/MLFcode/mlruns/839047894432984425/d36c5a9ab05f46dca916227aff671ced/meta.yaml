@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/839047894432984425/d36c5a9ab05f46dca916227aff671ced/artifacts
+end_time: 1761799475041
+entry_point_name: ''
+experiment_id: '839047894432984425'
+lifecycle_stage: active
+run_id: d36c5a9ab05f46dca916227aff671ced
+run_name: spiffy-kite-484
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1761799469588
+status: 3
+tags: []
+user_id: csh

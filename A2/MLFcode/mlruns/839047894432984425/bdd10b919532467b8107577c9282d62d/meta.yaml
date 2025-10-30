@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/839047894432984425/bdd10b919532467b8107577c9282d62d/artifacts
+end_time: 1761798772418
+entry_point_name: ''
+experiment_id: '839047894432984425'
+lifecycle_stage: active
+run_id: bdd10b919532467b8107577c9282d62d
+run_name: peaceful-gnat-463
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1761798766702
+status: 3
+tags: []
+user_id: csh

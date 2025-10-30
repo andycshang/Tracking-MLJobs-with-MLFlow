@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/839047894432984425/5f6ab4333367454891d120bc3e58eae6/artifacts
+end_time: 1761804107604
+entry_point_name: ''
+experiment_id: '839047894432984425'
+lifecycle_stage: active
+run_id: 5f6ab4333367454891d120bc3e58eae6
+run_name: sneaky-croc-742
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1761804101553
+status: 3
+tags: []
+user_id: csh
