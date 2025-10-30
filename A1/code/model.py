@@ -6,6 +6,10 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
+import mlflow
+mlflow.set_tracking_uri("http://127.0.0.1:5000")
+mlflow.set_experiment("Boston_Housing")
+
 data = pd.read_excel('Boston_Housing.xlsx')
 #print(data.shape)
 
@@ -122,5 +126,32 @@ with open("model.pkl", "wb") as f:
 
 print("Model saved as model.pkl")
 
+with mlflow.start_run():
+    # 1️⃣ 记录模型超参数
+    mlflow.log_param("alpha", alpha)
+    mlflow.log_param("iterations", iterations)
 
+    # 2️⃣ 记录模型指标
+    mlflow.log_metric("train_mse", J_hist[-1])
+    mlflow.log_metric("test_mse", mse)
 
+    # 3️⃣ 定义一个自定义的 Python 模型包装器
+    class MyLinearRegressionWrapper(mlflow.pyfunc.PythonModel):
+        def load_context(self, context):
+            import pickle
+            with open("model.pkl", "rb") as f:
+                self.model_data = pickle.load(f)
+
+        def predict(self, context, model_input):
+            w = self.model_data["w"]
+            b = self.model_data["b"]
+            scaler = self.model_data["x_scaler"]
+            X_scaled = scaler.transform(model_input)
+            return np.dot(X_scaled, w) + b
+
+    # 4️⃣ 注册模型到 MLflow 模型注册表
+    mlflow.pyfunc.log_model(
+        artifact_path="model",
+        python_model=MyLinearRegressionWrapper(),
+        registered_model_name="Boston_Housing_Manual_LR"
+    )

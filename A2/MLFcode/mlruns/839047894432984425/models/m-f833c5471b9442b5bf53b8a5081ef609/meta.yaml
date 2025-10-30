@@ -1,0 +1,10 @@
+artifact_location: mlflow-artifacts:/839047894432984425/models/m-f833c5471b9442b5bf53b8a5081ef609/artifacts
+creation_timestamp: 1761804628328
+experiment_id: '839047894432984425'
+last_updated_timestamp: 1761804634949
+model_id: m-f833c5471b9442b5bf53b8a5081ef609
+model_type: ''
+name: Boston_Housing_Registry
+source_run_id: 14c4e1a1ffd94380b4c15351e9b2eaeb
+status: 2
+status_message: null

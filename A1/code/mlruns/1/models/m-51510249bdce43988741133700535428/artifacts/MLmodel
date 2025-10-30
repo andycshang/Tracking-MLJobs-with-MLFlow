@@ -1,0 +1,19 @@
+artifact_path: /Users/csh/PycharmProjects/Tracking-MLJobs-with-MLFlow/A1/code/mlruns/1/models/m-51510249bdce43988741133700535428/artifacts
+flavors:
+  python_function:
+    cloudpickle_version: 3.1.1
+    code: null
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.pyfunc.model
+    python_model: python_model.pkl
+    python_version: 3.9.12
+    streamable: false
+mlflow_version: 3.1.4
+model_id: m-51510249bdce43988741133700535428
+model_size_bytes: 3143
+model_uuid: m-51510249bdce43988741133700535428
+prompts: null
+run_id: 55beb0dbcad441b39f1c092aba05bbed
+utc_time_created: '2025-10-29 02:39:28.347141'

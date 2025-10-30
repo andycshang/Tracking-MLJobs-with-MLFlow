@@ -157,14 +157,33 @@ echo "Step 6/6: Deployment finished successfully!"
 * `./deploy.sh`
 
 
-## prediction example:
+## test example:
 {
-  "data": [0.00632, 18.0, 2.31, 0, 0.538, 6.575, 65.2, 4.0900, 1, 296, 15.3, 396.90, 4.98]
+    "CRIM": 0.03,
+    "ZN": 18.0,
+    "INDUS": 2.3,
+    "CHAS": 0,
+    "NOX": 0.4,
+    "RM": 6.5,
+    "AGE": 45.0,
+    "DIS": 5.2,
+    "RAD": 1,
+    "TAX": 290.0,
+    "PTRATIO": 17.8,
+    "B": 390.0,
+    "LSTAT": 12.5
 }
 
 
 # A3
-为api添加数据输入验证：
+
+### Adding Data Input Validation to the API
+
+We defined the `HouseData` class to validate inputs:
+
+```python
+from pydantic import BaseModel, Field
+
 class HouseData(BaseModel):
     CRIM: float = Field(..., ge=0)
     ZN: float = Field(..., ge=0)
@@ -179,11 +198,21 @@ class HouseData(BaseModel):
     PTRATIO: float = Field(..., ge=0)
     B: float = Field(..., ge=0)
     LSTAT: float = Field(..., ge=0)
-Field(...)中的'...'验证了该数据是否传入，若用户没有传入则报错；
-int, float等则规定了输入数据类型
-ge为greater or equal，le为less or equal，规定了数据范围
+```
 
-对应修改api的predict方法：
+**Explanation of the validation rules:**
+
+* `Field(...)` ensures that a value must be provided; an error is raised if the user omits it.
+* `int`, `float`, etc., enforce the expected data type.
+* `ge` (greater than or equal) and `le` (less than or equal) define the valid range for the input.
+
+---
+
+### Updated `predict` Endpoint
+
+The API's `predict` method was modified to use the validated input:
+
+```python
 @app.post("/predict")
 def predict_endpoint(input_data: HouseData):
     X = np.array([[input.CRIM, input.ZN, input.INDUS, input.CHAS, input.NOX,
@@ -192,30 +221,90 @@ def predict_endpoint(input_data: HouseData):
     X_scaled = x_scaler.transform(X)
     y_pred = np.dot(X_scaled, w) + b
     return {"prediction": float(y_pred[0])}
+```
 
-验证可行性：当我输入超过范围的数据时：
-Error: Unprocessable Entity
-Response body
-Download
+---
+
+### Input Validation Example
+
+When input values exceed the allowed range, the API responds with an error:
+
+**Request:**
+
+* `CHAS` = 2 (should be ≤ 1)
+
+**Response:**
+
+```json
 {
   "detail": [
     {
       "type": "less_than_equal",
-      "loc": [
-        "body",
-        "CHAS"
-      ],
+      "loc": ["body", "CHAS"],
       "msg": "Input should be less than or equal to 1",
       "input": 2,
-      "ctx": {
-        "le": 1
-      }
+      "ctx": {"le": 1}
     }
   ]
 }
+```
 
-将这个测试过程自动化，写入test_api.py，并规定正确输入时应该返回 200 + prediction，
-缺少数据时输入返回422（Unprocessable Entity)，类型错误时返回422
+---
+
+### Automated Testing
+
+We automated this validation in `test_api.py`:
+
+* **Valid input:** returns HTTP 200 + prediction
+* **Missing required field:** returns HTTP 422 (Unprocessable Entity)
+* **Wrong data type:** returns HTTP 422
+
+**Example test results:**
+
+```
+test_api.py::test_predict_happy_path PASSED                              [ 33%]
+test_api.py::test_predict_missing_field PASSED                           [ 66%]
+test_api.py::test_predict_invalid_type PASSED                            [100%]
+```
+
+> "PASSED" indicates that the test cases correctly handle different scenarios.
+
+---
+
+### Troubleshooting
+
+One of the most persistent errors encountered was:
+
+```
+========================= MLFcode/test_api.py:None (MLFcode/test_api.py)
+MLFcode/test_api.py:2: in <module> from api import app 
+MLFcode/api.py:11: in <module> with open("model.pkl", "rb") as f: 
+E FileNotFoundError: [Errno 2] No such file or directory: 'model.pkl'
+```
+
+Even though `model.pkl`, `test_api.py`, and `api.py` were in the same folder, the file could not be found.
+
+**Solution:**
+Changed the pytest working directory in **Edit Configuration** to the current folder. After this adjustment, the error was resolved.
+
+---
+
+### Adding Versioning for Model Deployment
+
+To support multiple model versions, the following was added to `api.py`:
+
+```python
+import os
+
+MODEL_DIR = "models"  # Directory to store different model versions
+VERSION = "1.0"       # Default latest model version
+os.makedirs(MODEL_DIR, exist_ok=True)
+MODEL_PATH = os.path.join(MODEL_DIR, f"model_v{VERSION}.pkl")
+```
+
+* A new folder `models` was created to store versioned models.
+* `VERSION` defines the default model version used by the API.
+* `MODEL_PATH` constructs the full path to the versioned model file.
 
 
 
